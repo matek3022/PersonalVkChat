@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_dialogs"
+        android:checkable="true"
+        android:title="@string/title_dialogs" />
+
+    <item
+        android:id="@+id/menu_friends"
+        android:checkable="true"
+        android:title="@string/title_friends" />
+
+    <item
+        android:id="@+id/menu_settings"
+        android:checkable="true"
+        android:title="@string/title_settings" />
+
+    <!--<item-->
+        <!--android:id="@+id/menu_innovations"-->
+        <!--android:checkable="true"-->
+        <!--android:icon="@drawable/ic_menu_novelties"-->
+        <!--android:title="@string/menu_innovations" />-->
+
+    <!--Пока убираем этот функиционал-->
+    <!--<item-->
+        <!--android:id="@+id/menu_my_scores"-->
+        <!--android:checkable="true"-->
+        <!--android:icon="@drawable/ic_app_icon"-->
+        <!--android:title="@string/menu_my_scores" />-->
+
+    <!--<item-->
+        <!--android:id="@+id/menu_profile"-->
+        <!--android:checkable="true"-->
+        <!--android:icon="@drawable/ic_menu_profile"-->
+        <!--android:title="@string/menu_profile" />-->
+
+    <!--<item-->
+        <!--android:id="@+id/menu_settings"-->
+        <!--android:checkable="true"-->
+        <!--android:icon="@drawable/ic_menu_settings"-->
+        <!--android:title="@string/menu_settings" />-->
+
+    <!--Пока убираем этот функиционал-->
+    <!--<item-->
+        <!--android:id="@+id/menu_feedback"-->
+        <!--android:checkable="true"-->
+        <!--android:icon="@drawable/ic_feedback"-->
+        <!--android:title="@string/menu_feedback" />-->
+
+    <!--<item-->
+        <!--android:id="@+id/menu_about"-->
+        <!--android:checkable="true"-->
+        <!--android:icon="@drawable/ic_menu_about"-->
+        <!--android:title="@string/menu_about" />-->
+
+</menu>

@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Cookies</string>
+    <string name="title_dialogs">Диалоги</string>
+    <string name="title_settings" translatable="false">Настройки</string>
+    <string name="title_friends" translatable="false">Друзья</string>
+
+
+
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+    <string name="LOST_INTERNET_CONNECTION">Internet connection is lost</string>
+    <string name="HOME_PHONE">"Home phone: "</string>
+    <string name="MOBILE_PHONE">"Mobile phone: "</string>
+    <string name="UNIVERSITY">"University: "</string>
+    <string name="BIRTHSDAY">"Birthday: "</string>
+    <string name="ONLINE" translatable="false">"Online"</string>
+    <string name="OFFLINE" translatable="false">"Offline"</string>
+    <string name="SETTINGS">Settings</string>
+    <string name="ALL_FRIENDS">All friends</string>
+    <string name="FRIENDS">Friends</string>
+    <string name="FORWARD_MESSAGES">Forward messages</string>
+    <string name="YOU">"You: "</string>
+    <string name="COMMUNITY">Community</string>
+    <string name="FILTER">Filter</string>
+    <string name="VOID_MESSAGE">Void message</string>
+    <string name="FORWARD">Send on</string>
+    <string name="PHOTO">Photo</string>
+    <string name="STICKER">Sticker</string>
+    <string name="LOADING">Loading...</string>
+    <string name="GIFT">Gift</string>
+    <string name="WRITE_MESSAGE"> Write message</string>
+    <string name="show_profile_photos">Show profile photos</string>
+    <string name="display_attached_photo">Display attached photo</string>
+    <string name="online" translatable="false">Online</string>
+    <string name="press_the_button_to_exit">Press the button to exit</string>
+    <string name="out">Touch me</string>
+    <string name="send_message">Send message</string>
+    <string name="friend_list">Friend list</string>
+    <string name="stop" translatable="false">stop</string>
+    <string name="left_chat">left chat</string>
+    <string name="enter_key_this">Write key this</string>
+    <string name="title_settings_app">Настройки приложения</string>
+</resources>

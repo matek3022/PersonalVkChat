@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/dialogAlertTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/defaultPadding"
+        android:fontFamily="sans-serif-medium"
+        android:text="Переслать сообщения в:"
+        android:textColor="@color/primary_dark"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/dialog_variant"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialogAlertTitle"
+        android:layout_marginBottom="@dimen/defaultPadding"
+        android:background="@drawable/circledialogs"
+        android:gravity="center"
+        android:padding="@dimen/defaultPadding"
+        android:text="Доступные диалоги"
+        android:textColor="@color/primary_dark"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/friend_variant"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_variant"
+        android:background="@drawable/circledialogs"
+        android:gravity="center"
+        android:padding="@dimen/defaultPadding"
+        android:text="Новый диалог с другом"
+        android:textColor="@color/primary_dark"
+        android:textSize="18sp" />
+</RelativeLayout>

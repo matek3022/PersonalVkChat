@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/inputContainer"
+        android:background="@android:color/white"
+        app:srl_direction="both"
+        tools:context="com.shppandroid1.app.Main2Activity">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alwaysDrawnWithCache="false"
+            android:background="@android:color/white"
+            android:divider="@null" />
+    </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+
+    <RelativeLayout
+        android:id="@+id/inputContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/typing_tv"
+            android:visibility="invisible"
+            android:textColor="@color/gray_alpha_30"
+            android:text="Набирает сообщение..."
+            android:gravity="center"
+            android:textSize="12sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/emoji_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/defaultPadding"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+
+        <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+            android:layout_below="@id/typing_tv"
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/emoji_button"
+            android:layout_toLeftOf="@id/button"
+            android:layout_toRightOf="@+id/emoji_button"
+            android:layout_toStartOf="@id/button"
+            android:background="@android:color/white"
+            android:ems="10"
+            android:hint="@string/WRITE_MESSAGE"
+            android:inputType="textMultiLine"
+            android:maxLines="5"
+            android:minHeight="40dp"
+            android:paddingLeft="@dimen/defaultPadding"
+            android:paddingRight="@dimen/defaultPadding"
+            android:paddingBottom="@dimen/defaultPadding"
+            tools:text="asgdddddsdfsadhfghasjdgfjhsagdjfgjhasgdfjhgsjahdgfjgsajdgfjhsgajdhfgjasgdjhfgjashdgfjhasgdfasdfgjasdfsadfsad" />
+
+        <Button
+            android:layout_marginRight="@dimen/defaultPadding"
+            android:id="@+id/button"
+            android:layout_centerVertical="true"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/send" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/fab"
+        android:layout_width="@dimen/sizeImageMedium"
+        android:layout_height="@dimen/sizeImageMedium"
+        android:layout_above="@+id/inputContainer"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/defaultPadding"
+        android:background="@mipmap/forward_icon" />
+
+</RelativeLayout>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="Security"
+        android:id="@+id/dialog_menu_security"
+        android:orderInCategory="139"
+        android:icon="@drawable/ic_settings"
+        app:showAsAction="always" />
+
+    <item
+        android:title="reload"
+        android:id="@+id/dialog_menu_reload"
+        android:icon="@drawable/reload"
+        android:orderInCategory="139"
+        app:showAsAction="always" />
+
+</menu>
