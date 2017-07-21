@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import cn.nekocode.emojix.Emojix;
-import company.matek3022.personalvkchat.fragments.states.DialogListState;
+import company.matek3022.personalvkchat.fragments.states.DialogState;
 import company.matek3022.personalvkchat.vkobjects.longpolling.LongPollService;
 import me.ilich.juggler.Juggler;
 import me.ilich.juggler.gui.JugglerActivity;
@@ -46,7 +46,7 @@ public class BaseActivity extends JugglerActivity{
     protected State createState() {
         State state = (State) getIntent().getSerializableExtra(EXTRA_STATE);
         if (state == null) {
-            state =  new DialogListState(null);
+            state =  new DialogState();
         }
         return state;
     }

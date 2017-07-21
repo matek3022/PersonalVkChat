@@ -23,19 +23,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import company.matek3022.personalvkchat.R;
-import company.matek3022.personalvkchat.activitys.BaseActivity;
-import company.matek3022.personalvkchat.fragments.states.ForwardMessagesState;
-import company.matek3022.personalvkchat.managers.PreferencesManager;
-import company.matek3022.personalvkchat.transformation.CircularTransformation;
-import company.matek3022.personalvkchat.utils.CryptUtils;
-import company.matek3022.personalvkchat.utils.Util;
-import company.matek3022.personalvkchat.vkobjects.Attachment;
-import company.matek3022.personalvkchat.vkobjects.Dialogs;
-import company.matek3022.personalvkchat.vkobjects.ItemMess;
-import company.matek3022.personalvkchat.vkobjects.ServerResponse;
-import company.matek3022.personalvkchat.vkobjects.User;
-import company.matek3022.personalvkchat.vkobjects.VideoInformation;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.luseen.autolinklibrary.AutoLinkMode;
@@ -50,14 +37,27 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
+import company.matek3022.personalvkchat.R;
+import company.matek3022.personalvkchat.activitys.BaseActivity;
+import company.matek3022.personalvkchat.fragments.states.ForwardMessagesState;
+import company.matek3022.personalvkchat.managers.PreferencesManager;
+import company.matek3022.personalvkchat.transformation.CircularTransformation;
+import company.matek3022.personalvkchat.utils.CryptUtils;
+import company.matek3022.personalvkchat.utils.Util;
+import company.matek3022.personalvkchat.vkobjects.Attachment;
+import company.matek3022.personalvkchat.vkobjects.Dialogs;
+import company.matek3022.personalvkchat.vkobjects.ItemMess;
+import company.matek3022.personalvkchat.vkobjects.ServerResponse;
+import company.matek3022.personalvkchat.vkobjects.User;
+import company.matek3022.personalvkchat.vkobjects.VideoInformation;
 import me.ilich.juggler.change.Add;
 import me.ilich.juggler.gui.JugglerFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static company.matek3022.personalvkchat.App.service;
 import static com.vk.sdk.VKUIHelper.getApplicationContext;
+import static company.matek3022.personalvkchat.App.service;
 
 /**
  * Created by matek on 08.07.2017.
@@ -102,7 +102,6 @@ public class ForwardMessagesFragment extends JugglerFragment {
         chatId = getArguments().getInt(EXTRA_CHAT_ID);
         crypting = preferencesManager.getIsCryptById(chatId);
         cryptKey = preferencesManager.getCryptKeyById(chatId);
-        view.findViewById(R.id.fab).setVisibility(View.GONE);
         view.findViewById(R.id.inputContainer).setVisibility(View.GONE);
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
         refreshLayout = (SwipyRefreshLayout) view.findViewById(R.id.refresh);
@@ -124,7 +123,6 @@ public class ForwardMessagesFragment extends JugglerFragment {
 
     private class ViewHolder extends RecyclerView.ViewHolder {
         ImageView photo;
-        ImageView online;
         AutoLinkTextView body;
         TextView time;
         RelativeLayout background;
@@ -134,7 +132,6 @@ public class ForwardMessagesFragment extends JugglerFragment {
         public ViewHolder(View itemView) {
             super(itemView);
             photo = (ImageView) itemView.findViewById(R.id.imageView);
-            online = (ImageView) itemView.findViewById(R.id.imageView6);
             body = (AutoLinkTextView) itemView.findViewById(R.id.textView2);
             time = (TextView) itemView.findViewById(R.id.textView);
             background = (RelativeLayout) itemView.findViewById(R.id.relativeLayout);
@@ -194,11 +191,6 @@ public class ForwardMessagesFragment extends JugglerFragment {
                 holder.foo.setBackgroundColor(Color.WHITE);
             }
             holder.line.removeAllViews();
-            if (user.getOnline() != 0) {
-                holder.online.setVisibility(View.VISIBLE);
-            } else {
-                holder.online.setVisibility(View.INVISIBLE);
-            }
             if (preferencesManager.getSettingPhotoUserOn()) {
                 Picasso.with(getActivity())
                         .load(user.getPhoto_100())
@@ -234,13 +226,8 @@ public class ForwardMessagesFragment extends JugglerFragment {
             } else {
                 holder.time.setText(user.getFirst_name() + " " + user.getLast_name() + ", " + time_year);
             }
-            if (user.getOnline() == 0) {
-                holder.online.setVisibility(View.INVISIBLE);
-            } else {
-                holder.online.setVisibility(View.VISIBLE);
-            }
             holder.body.addAutoLinkMode(AutoLinkMode.MODE_URL);
-            holder.body.setUrlModeColor(Color.rgb(0, 200, 250));
+            holder.body.setUrlModeColor(getContext().getResources().getColor(R.color.accent));
             holder.body.setAutoLinkOnClickListener(new AutoLinkOnClickListener() {
                 @Override
                 public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText) {
@@ -529,7 +516,7 @@ public class ForwardMessagesFragment extends JugglerFragment {
 
             }
             if (crypting) bodyContainer = CryptUtils.decryptWritibleString(bodyContainer, cryptKey);
-            holder.body.setTextColor(getResources().getColor(crypting ? R.color.orange : R.color.black));
+            holder.body.setTextColor(getResources().getColor(crypting ? R.color.green : R.color.primary_dark));
             holder.body.setAutoLinkText(bodyContainer);
             View.OnLongClickListener copyTextListener = new View.OnLongClickListener() {
                 @Override

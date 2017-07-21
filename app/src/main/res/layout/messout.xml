@@ -27,12 +27,15 @@
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:text="TextView"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="@color/primary_dark"
+                />
 
             <TextView
                 android:id="@+id/textView"
+                android:textColor="@color/primary_dark"
+                android:textSize="12sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/line"
@@ -49,19 +52,12 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/imageView6"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:src="@drawable/tochka"
-            android:layout_alignBottom="@+id/imageView"
-            android:layout_alignEnd="@+id/imageView"
-            android:layout_alignRight="@+id/imageView" />
 
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:src="@drawable/ic_mess_out"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"

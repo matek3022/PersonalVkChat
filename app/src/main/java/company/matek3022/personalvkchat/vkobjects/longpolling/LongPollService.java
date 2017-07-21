@@ -14,13 +14,12 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 import company.matek3022.personalvkchat.R;
 import company.matek3022.personalvkchat.activitys.BaseActivity;
 import company.matek3022.personalvkchat.managers.PreferencesManager;
 import company.matek3022.personalvkchat.vkobjects.ServerResponse;
-
-import java.util.ArrayList;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -75,7 +74,7 @@ public class LongPollService extends Service {
     }
 
     private void startRequest() {
-        service.connect("https://" + getLpSrvr.getServer(), getLpSrvr.getKey(), getLpSrvr.getTs(),"a_check", 25, 2).enqueue(new Callback<LongPollResponse>() {
+        service.connect("https://" + getLpSrvr.getServer(), getLpSrvr.getKey(), getLpSrvr.getTs(),"a_check", 25, 0).enqueue(new Callback<LongPollResponse>() {
             @Override
             public void onResponse(Call<LongPollResponse> call, Response<LongPollResponse> response) {
                 Log.i("ResponseLongPoll", response.toString());
@@ -150,21 +149,21 @@ public class LongPollService extends Service {
                         case LongPollEvent.READ_OUT_EVENT:
                             intent = new Intent(LongPollEvent.READ_OUT_INTENT);
                             break;
-                        case LongPollEvent.ONLINE_EVENT:
-                            intent = new Intent(LongPollEvent.ONLINE_INTENT);
-                            break;
-                        case LongPollEvent.OFFLINE_EVENT:
-                            intent = new Intent(LongPollEvent.OFFLINE_INTENT);
-                            break;
+//                        case LongPollEvent.ONLINE_EVENT:
+//                            intent = new Intent(LongPollEvent.ONLINE_INTENT);
+//                            break;
+//                        case LongPollEvent.OFFLINE_EVENT:
+//                            intent = new Intent(LongPollEvent.OFFLINE_INTENT);
+//                            break;
                         case LongPollEvent.TYPING_IN_USER_EVENT:
                             intent = new Intent(LongPollEvent.TYPING_IN_USER_INTENT);
                             break;
                         case LongPollEvent.TYPING_IN_CHAT_EVENT:
                             intent = new Intent(LongPollEvent.TYPING_IN_CHAT_INTENT);
                             break;
-                        case LongPollEvent.NEW_COUNT_EVENT:
-                            intent = new Intent(LongPollEvent.NEW_COUNT_INTENT);
-                            break;
+//                        case LongPollEvent.NEW_COUNT_EVENT:
+//                            intent = new Intent(LongPollEvent.NEW_COUNT_INTENT);
+//                            break;
                     }
                     if (intent != null) {
                         intent.putExtra(LongPollEvent.INTENT_EXTRA_SERIALIZABLE, longPollEvents.get(i));

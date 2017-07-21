@@ -1,6 +1,5 @@
 package company.matek3022.personalvkchat.fragments;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -20,8 +19,10 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,12 +32,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,12 +56,8 @@ import java.util.TimeZone;
 
 import company.matek3022.personalvkchat.R;
 import company.matek3022.personalvkchat.activitys.BaseActivity;
-import company.matek3022.personalvkchat.fragments.states.DialogListState;
-import company.matek3022.personalvkchat.fragments.states.ForwardMessagesState;
-import company.matek3022.personalvkchat.fragments.states.FriendListState;
 import company.matek3022.personalvkchat.managers.PreferencesManager;
 import company.matek3022.personalvkchat.sqlite.DBHelper;
-import company.matek3022.personalvkchat.transformation.CircularTransformation;
 import company.matek3022.personalvkchat.utils.CryptUtils;
 import company.matek3022.personalvkchat.utils.GuiUtils;
 import company.matek3022.personalvkchat.utils.Util;
@@ -75,7 +70,6 @@ import company.matek3022.personalvkchat.vkobjects.VideoInformation;
 import company.matek3022.personalvkchat.vkobjects.longpolling.LongPollEvent;
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
-import me.ilich.juggler.change.Add;
 import me.ilich.juggler.gui.JugglerFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -90,25 +84,14 @@ import static company.matek3022.personalvkchat.App.service;
 
 public class DialogFragment extends JugglerFragment {
 
-    private static final String EXTRA_USER_ID = "userID";
-    private static final String EXTRA_CHAT_ID = "ChatID";
-    private static final String EXTRA_FORWARD_MESS = "frwrd_mess";
-
-    public static DialogFragment getInstance(int userId, int chatId, String forwardMess) {
-        DialogFragment fragment = new DialogFragment();
-        Bundle args = new Bundle();
-        args.putInt(EXTRA_USER_ID, userId);
-        args.putInt(EXTRA_CHAT_ID, chatId);
-        args.putString(EXTRA_FORWARD_MESS, forwardMess);
-        fragment.setArguments(args);
-        return fragment;
+    public static DialogFragment getInstance() {
+        return new DialogFragment();
     }
 
     private ArrayList<Integer> frwdMessages = new ArrayList<>();
 
     private int profileId = PreferencesManager.getInstance().getUserID();
     private int user_id;
-    private int chat_id;
     private String title;
     private boolean frwd;
     private Adapter adapter;
@@ -117,13 +100,10 @@ public class DialogFragment extends JugglerFragment {
     private SwipyRefreshLayout refreshLayout;
     private int off;
     private ArrayList<Dialogs> items;
-    private ArrayList<User> names;
-    private ArrayList<Integer> namesIds;
     private SQLiteDatabase dataBase;
     private PreferencesManager preferencesManager;
     private EmojiconEditText mess;
     private View typingTV;
-    private Button forwardButton;
     private String inputForwardMess;
 
     private boolean crypting;
@@ -131,12 +111,12 @@ public class DialogFragment extends JugglerFragment {
 
     private BroadcastReceiver messagesReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, final Intent intent) {
             new AsyncTask<Intent, Void, Boolean>() {
                 @Override
                 protected Boolean doInBackground(Intent... params) {
                     if (items != null) {
-                        if (items.size() > 0) {
+                        if (items.size() >= 0) {
                             LongPollEvent event = (LongPollEvent) params[0].getSerializableExtra(LongPollEvent.INTENT_EXTRA_SERIALIZABLE);
                             int value = event.flags;
                             int read = 1;
@@ -194,24 +174,17 @@ public class DialogFragment extends JugglerFragment {
                             }
                             if (currChatId == 0) {
                                 if (currUserId == user_id) {
-                                    if (items.get(items.size()-1).getId() == 0) {
-                                        items.get(items.size() - 1).setId(event.mid);
-                                        items.get(items.size() - 1).setDate(System.currentTimeMillis() / 1000L);
+                                    if (items.size()>0) {
+                                        if (items.get(items.size()-1).getId() == 0) {
+                                            items.get(items.size() - 1).setId(event.mid);
+                                            items.get(items.size() - 1).setDate(System.currentTimeMillis() / 1000L);
+                                        } else {
+                                            items.add(new Dialogs(event.mid, currUserId, currChatId, profileId, event.message, read, out, System.currentTimeMillis() / 1000L));
+                                        }
                                     } else {
                                         items.add(new Dialogs(event.mid, currUserId, currChatId, profileId, event.message, read, out, System.currentTimeMillis() / 1000L));
                                     }
-                                    if (adapter != null) {
-                                        return true;
-                                    }
-                                }
-                            } else {
-                                if (currChatId == chat_id) {
-                                    if (items.get(items.size()-1).getId() == 0) {
-                                        items.get(items.size() - 1).setId(event.mid);
-                                        items.get(items.size() - 1).setDate(System.currentTimeMillis() / 1000L);
-                                    } else {
-                                        items.add(new Dialogs(event.mid, currUserId, currChatId, profileId, event.message, read, out, System.currentTimeMillis() / 1000L));
-                                    }
+
                                     if (adapter != null) {
                                         return true;
                                     }
@@ -236,107 +209,26 @@ public class DialogFragment extends JugglerFragment {
         }
     };
 
-    private BroadcastReceiver onlineReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            new AsyncTask<Intent, Void, Boolean>() {
-                @Override
-                protected Boolean doInBackground(Intent... params) {
-                    if (names != null) {
-                        if (names.size() > 0) {
-                            LongPollEvent event = (LongPollEvent) params[0].getSerializableExtra(LongPollEvent.INTENT_EXTRA_SERIALIZABLE);
-                            for (int i = 0; i < names.size(); i++) {
-                                if (names.get(i).getId() == event.userId) {
-                                    names.get(i).setOnline(1);
-                                    if (adapter != null) return true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Boolean aBoolean) {
-                    if (aBoolean != null) {
-                        if (aBoolean) {
-                            adapter.notifyDataSetChanged();
-                        }
-                    }
-                }
-            }.execute(intent);
-
-        }
-    };
-
-    private BroadcastReceiver offlineReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            new AsyncTask<Intent, Void, Boolean>() {
-                @Override
-                protected Boolean doInBackground(Intent... params) {
-                    if (names != null) {
-                        if (names.size() > 0) {
-                            LongPollEvent event = (LongPollEvent) params[0].getSerializableExtra(LongPollEvent.INTENT_EXTRA_SERIALIZABLE);
-                            for (int i = 0; i < names.size(); i++) {
-                                if (names.get(i).getId() == event.userId) {
-                                    names.get(i).setOnline(0);
-                                    if (adapter != null) return true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Boolean aBoolean) {
-                    if (aBoolean != null) {
-                        if (aBoolean) {
-                            adapter.notifyDataSetChanged();
-                        }
-                    }
-                }
-            }.execute(intent);
-        }
-    };
-
     private BroadcastReceiver typingReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            new AsyncTask<Intent, Void, User>() {
+            new AsyncTask<Intent, Void, Boolean>() {
                 @Override
-                protected User doInBackground(Intent... params) {
+                protected Boolean doInBackground(Intent... params) {
                     LongPollEvent event = (LongPollEvent) params[0].getSerializableExtra(LongPollEvent.INTENT_EXTRA_SERIALIZABLE);
                     if (event.chatId == 0) {
-                        if (chat_id == 0) {
                             if (user_id == event.userId) {
-                                for (int i = 0; i < names.size(); i++) {
-                                    if (user_id == names.get(i).getId()) {
-                                        return names.get(i);
-                                    }
-                                }
+                                return true;
                             }
-                        }
-                    } else {
-                        if (chat_id == event.chatId) {
-                            for (int i = 0; i < names.size(); i++) {
-                                if (event.userId == names.get(i).getId()) {
-                                    return names.get(i);
-                                }
-                            }
-                        }
                     }
                     return null;
                 }
 
                 @Override
-                protected void onPostExecute(User user) {
-                    if (user != null) {
+                protected void onPostExecute(Boolean bool) {
+                    if (bool != null) {
                         typingTV.setVisibility(View.VISIBLE);
-                        ((TextView) typingTV).setText(user.getFirst_name() + " " + "набирает сообщение...");
+                        ((TextView) typingTV).setText("Набирает сообщение...");
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -356,9 +248,9 @@ public class DialogFragment extends JugglerFragment {
                 @Override
                 protected Boolean doInBackground(Intent... params) {
                     if (items != null) {
-                        if (items.size() > 0) {
+                        if (items.size() >= 0) {
                             LongPollEvent event = (LongPollEvent) params[0].getSerializableExtra(LongPollEvent.INTENT_EXTRA_SERIALIZABLE);
-                            if (event.userId == user_id || event.userId == chat_id + 2000000000) {
+                            if (event.userId == user_id) {
                                 for (int i = 0; i < items.size(); i++) {
                                     if (items.get(i).getOut() == 0) {
                                         items.get(i).setRead_state(1);
@@ -390,9 +282,9 @@ public class DialogFragment extends JugglerFragment {
                 @Override
                 protected Boolean doInBackground(Intent... params) {
                     if (items != null) {
-                        if (items.size() > 0) {
+                        if (items.size() >= 0) {
                             LongPollEvent event = (LongPollEvent) params[0].getSerializableExtra(LongPollEvent.INTENT_EXTRA_SERIALIZABLE);
-                            if (event.userId == user_id || event.userId == chat_id + 2000000000) {
+                            if (event.userId == user_id) {
                                 for (int i = 0; i < items.size(); i++) {
                                     if (items.get(i).getOut() == 1) {
                                         items.get(i).setRead_state(1);
@@ -421,10 +313,13 @@ public class DialogFragment extends JugglerFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        user_id = PreferencesManager.getInstance().getChatUserId();
+        getActivity().setTitle(PreferencesManager.getInstance().getTitle());
+        if (user_id == 0) {
+            showUserIdDialog();
+        }
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
         localBroadcastManager.registerReceiver(messagesReceiver, new IntentFilter(LongPollEvent.NEW_MESSAGE_INTENT));
-        localBroadcastManager.registerReceiver(onlineReceiver, new IntentFilter(LongPollEvent.ONLINE_INTENT));
-        localBroadcastManager.registerReceiver(offlineReceiver, new IntentFilter(LongPollEvent.OFFLINE_INTENT));
         localBroadcastManager.registerReceiver(typingReceiver, new IntentFilter(LongPollEvent.TYPING_IN_USER_INTENT));
         localBroadcastManager.registerReceiver(typingReceiver, new IntentFilter(LongPollEvent.TYPING_IN_CHAT_INTENT));
         localBroadcastManager.registerReceiver(readInReceiver, new IntentFilter(LongPollEvent.READ_IN_INTENT));
@@ -436,8 +331,6 @@ public class DialogFragment extends JugglerFragment {
     public void onDestroyView() {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
         localBroadcastManager.unregisterReceiver(messagesReceiver);
-        localBroadcastManager.unregisterReceiver(onlineReceiver);
-        localBroadcastManager.unregisterReceiver(offlineReceiver);
         localBroadcastManager.unregisterReceiver(typingReceiver);
         localBroadcastManager.unregisterReceiver(typingReceiver);
         localBroadcastManager.unregisterReceiver(readInReceiver);
@@ -451,18 +344,13 @@ public class DialogFragment extends JugglerFragment {
         frwd = false;
         dataBase = DBHelper.getInstance().getWritableDatabase();
         preferencesManager = PreferencesManager.getInstance();
-        user_id = getArguments().getInt(EXTRA_USER_ID, 0);
-        chat_id = getArguments().getInt(EXTRA_CHAT_ID, 0);
-        crypting = preferencesManager.getIsCryptById(chat_id == 0 ? user_id : 2000000000 + chat_id);
-        cryptKey = preferencesManager.getCryptKeyById(chat_id == 0 ? user_id : 2000000000 + chat_id);
+        crypting = preferencesManager.getIsCryptById(user_id);
+        cryptKey = preferencesManager.getCryptKeyById(user_id);
         if (cryptKey.equals("")) cryptKey = preferencesManager.getCryptKey();
-        inputForwardMess = getArguments().getString(EXTRA_FORWARD_MESS, null);
         if (inputForwardMess != null)
             frwdMessages = new Gson().fromJson(inputForwardMess, new TypeToken<ArrayList<Integer>>() {
             }.getType());
         items = new ArrayList<>();
-        names = new ArrayList<>();
-        namesIds = new ArrayList<>();
         adapter = new Adapter();
         typingTV = view.findViewById(R.id.typing_tv);
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
@@ -470,7 +358,6 @@ public class DialogFragment extends JugglerFragment {
         mess = (EmojiconEditText) view.findViewById(R.id.editText);
         refreshLayout = (SwipyRefreshLayout) view.findViewById(R.id.refresh);
         sendButton = (Button) view.findViewById(R.id.button);
-        forwardButton = (Button) view.findViewById(R.id.fab);
         ImageView imageEmoji = (ImageView) view.findViewById(R.id.emoji_button);
         imageEmoji.setImageResource(R.drawable.smiley);
         setHasOptionsMenu(true);
@@ -491,11 +378,11 @@ public class DialogFragment extends JugglerFragment {
             public void onRefresh(SwipyRefreshLayoutDirection direction) {
                 if (direction == SwipyRefreshLayoutDirection.BOTTOM) {
                     if (off != 0) {
-                        off -= 100;
+                        off -= 20;
                     }
                     refresh(off);
                 } else {
-                    off += 100;
+                    off += 20;
                     refresh(off);
                 }
             }
@@ -510,25 +397,22 @@ public class DialogFragment extends JugglerFragment {
                         if (crypting) message = CryptUtils.cryptWritibleString(message, cryptKey);
                         mess.setText("");
                         int kek = user_id;
-                        if (chat_id != 0) {
-                            kek = 0;
-                        }
 
                         String strIdMess = "";
                         for (int i = 0; i < frwdMessages.size(); i++) {
                             strIdMess += "," + frwdMessages.get(i);
                         }
                         final String messageFinal = message;
-                        items.add(new Dialogs(0, user_id, chat_id, profileId, messageFinal, 0, 1, 0));
+                        items.add(new Dialogs(0, user_id, 0, profileId, messageFinal, 0, 1, 0));
                         recyclerView.scrollToPosition(items.size()-1);
                         adapter.notifyDataSetChanged();
                         String TOKEN = preferencesManager.getToken();
-                        Call<ServerResponse> call = service.sendMessage(TOKEN, kek, message, chat_id, 2000000000 + chat_id, strIdMess);
+                        Call<ServerResponse> call = service.sendMessage(TOKEN, user_id, message, 0, 2000000000, strIdMess);
 
                         call.enqueue(new Callback<ServerResponse>() {
                             @Override
                             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                                if (response.body() == null) GuiUtils.showRequestLimitErrorMessage(getActivity());
+                                if (response.body() == null) GuiUtils.showRequestErrorMessage(getActivity());
                                 frwdMessages.clear();
                                 mess.setHint(getString(R.string.WRITE_MESSAGE));
                                 refreshLayout.setRefreshing(false);
@@ -564,23 +448,15 @@ public class DialogFragment extends JugglerFragment {
         });
 
         Cursor cursor = dataBase.query(DBHelper.TABLE_MESSAGES, null, DBHelper.KEY_ID_DIALOG + " = ?", new String[]{user_id + ""}, null, null, DBHelper.KEY_TIME_MESSAGES);
-        Cursor cursor1 = dataBase.query(DBHelper.TABLE_USERS_IN_MESSAGES, null, DBHelper.KEY_ID_DIALOG + " = ?", new String[]{user_id + ""}, null, null, DBHelper.KEY_ID);
-        Log.i("dataBase", cursor.getCount() + " " + cursor1.getCount());
+        Log.i("dataBase", String.valueOf(cursor.getCount()));
         if (cursor.moveToFirst()) {
-            Log.i("dataBase", cursor.getCount() + " " + cursor1.getCount());
-            cursor1.moveToFirst();
+            Log.i("dataBase", String.valueOf(cursor.getCount()));
             items.clear();
-            names.clear();
             Gson gson = new Gson();
             int dialog = cursor.getColumnIndex(DBHelper.KEY_OBJ);
-            int name = cursor1.getColumnIndex(DBHelper.KEY_OBJ);
             for (int i = 0; i < cursor.getCount(); i++) {
                 items.add(gson.fromJson(cursor.getString(dialog), Dialogs.class));
                 cursor.moveToNext();
-            }
-            for (int i = 0; i < cursor1.getCount(); i++) {
-                names.add(gson.fromJson(cursor1.getString(name), User.class));
-                cursor1.moveToNext();
             }
             adapter.reserv.addAll(items);
             off = 0;
@@ -590,35 +466,63 @@ public class DialogFragment extends JugglerFragment {
             refresh(off);
         }
         cursor.close();
-        cursor1.close();
 
-    }
-
-    public void nameRec(Dialogs contain_mess) {
-        boolean chek = false;
-        for (int i = 0; i < namesIds.size(); i++) {
-            if (namesIds.get(i) == contain_mess.getUser_id()) {
-                chek = true;
-            }
-        }
-        if (!chek) {
-            namesIds.add(contain_mess.getUser_id());
-        }
-        for (int i = 0; i < contain_mess.getFwd_messages().size(); i++) {
-            nameRec(contain_mess.getFwd_messages().get(i));
-        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        new UpdateDataBase(user_id, items, names).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        new UpdateDataBase(user_id, items).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.dialog_menu, menu);
+    }
+
+    private void showUserIdDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        preferencesManager = PreferencesManager.getInstance();
+        final View view = getActivity().getLayoutInflater().inflate(R.layout.layout_alert_select_dialog_id, null);
+        ((EditText)view.findViewById(R.id.input_user_id)).setText(String.valueOf(preferencesManager.getChatUserId()));
+        builder.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String selectUserName = ((EditText)view.findViewById(R.id.input_user_id)).getText().toString();
+                refreshLayout.setRefreshing(true);
+                service.getUser(preferencesManager.getToken(), selectUserName, null).enqueue(new Callback<ServerResponse<ArrayList<User>>>() {
+                    @Override
+                    public void onResponse(Call<ServerResponse<ArrayList<User>>> call, Response<ServerResponse<ArrayList<User>>> response) {
+                        if (response.body().getResponse()!=null) {
+                            if (response.body().getResponse().size()>0) {
+                                User user = response.body().getResponse().get(0);
+                                preferencesManager.setTitle(user.getFirst_name() + " " + user.getLast_name());
+                                preferencesManager.setChatUserId(user.getId());
+                                user_id = user.getId();
+                                getActivity().setTitle(user.getFirst_name() + " " + user.getLast_name());
+                                Toast.makeText(getActivity(), "Новый чат создается...", Toast.LENGTH_SHORT).show();
+                                off = 0;
+                                refresh(0);
+                            } else {
+                                GuiUtils.showMessage(getActivity(), "Некорректный id или nickName");
+                            }
+                        } else {
+                            GuiUtils.showMessage(getActivity(), "Некорректный id или nickName");
+                        }
+                        refreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ServerResponse<ArrayList<User>>> call, Throwable t) {
+                        refreshLayout.setRefreshing(false);
+                        Toast.makeText(getApplicationContext(), "Произошла ошибка", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+        builder.setView(view);
+        builder.show();
     }
 
     @Override
@@ -629,29 +533,7 @@ public class DialogFragment extends JugglerFragment {
                 refresh(off);
                 return true;
             case R.id.dialog_menu_security:
-                AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-                final View view = getActivity().getLayoutInflater().inflate(R.layout.layout_alert_dialog_security_setting, null);
-                ((Switch) view.findViewById(R.id.switch_security)).setChecked(crypting);
-                ((Switch) view.findViewById(R.id.switch_security)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        crypting = b;
-                    }
-                });
-                ((EditText)view.findViewById(R.id.et_security)).setText(preferencesManager.getCryptKeyById(chat_id == 0 ? user_id : 2000000000 + chat_id));
-                alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        preferencesManager.setIsCryptById(chat_id == 0 ? user_id : 2000000000 + chat_id, crypting);
-                        String localCryptKey = ((EditText)view.findViewById(R.id.et_security)).getText().toString();
-                        if (localCryptKey.equals("")) cryptKey = preferencesManager.getCryptKey();
-                        else cryptKey = localCryptKey;
-                        preferencesManager.setCryptKeyById(chat_id == 0 ? user_id : 2000000000 + chat_id, localCryptKey);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-                alertDialog.setView(view);
-                alertDialog.show();
+                showUserIdDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -663,72 +545,29 @@ public class DialogFragment extends JugglerFragment {
             refreshLayout.setRefreshing(true);
 
             String TOKEN = preferencesManager.getToken();
-            Call<ServerResponse<ItemMess<ArrayList<Dialogs>>>> call = service.getHistory(TOKEN, 100, offset, user_id == 0 ? chat_id + 2000000000 : user_id);
+            Call<ServerResponse<ItemMess<ArrayList<Dialogs>>>> call = service.getHistory(TOKEN, 20, offset, user_id);
 
             call.enqueue(new Callback<ServerResponse<ItemMess<ArrayList<Dialogs>>>>() {
                 @Override
                 public void onResponse(Call<ServerResponse<ItemMess<ArrayList<Dialogs>>>> call, Response<ServerResponse<ItemMess<ArrayList<Dialogs>>>> response) {
                     if (response.body().getResponse() != null) {
                         ArrayList<Dialogs> l = response.body().getResponse().getitem();
-                        String people_id = "" + l.get(0).getUser_id();
-                        namesIds.clear();
                         if (offset == 0) {
                             items.clear();
                             for (int i = 0; i < l.size(); i++) {
-                                nameRec(l.get(i));
                                 items.add(0, l.get(i));
                             }
                         } else {
                             for (int i = 0; i < l.size(); i++) {
-                                nameRec(l.get(i));
                                 items.add(0, l.get(i));
                             }
                         }
-                        for (int i = 0; i < namesIds.size(); i++) {
-                            people_id += "," + namesIds.get(i);
-                        }
-                        people_id += ", " + preferencesManager.getUserID();
-                        Log.i("chek", people_id);
                         refreshLayout.setRefreshing(false);
-
-                        String TOKEN = preferencesManager.getToken();
-                        Call<ServerResponse<ArrayList<User>>> call1 = service.getUser(TOKEN, people_id, "photo_100,photo_200,photo_400_orig,photo_max_orig, online,city,country,education, universities, schools,bdate,contacts");
-
-                        call1.enqueue(new Callback<ServerResponse<ArrayList<User>>>() {
-                            @Override
-                            public void onResponse(Call<ServerResponse<ArrayList<User>>> call1, Response<ServerResponse<ArrayList<User>>> response) {
-                                ArrayList<User> l = response.body().getResponse();
-                                if (l != null) {
-                                    if (offset == 0) {
-                                        names.clear();
-                                    }
-                                    for (int i = 0; i < l.size(); i++) {
-                                        names.add(l.get(i));
-                                    }
-                                    refreshLayout.setRefreshing(false);
-                                    recyclerView.scrollToPosition(items.size() - offset);
-                                    adapter.fwd_mess.clear();
-                                    adapter.reserv.clear();
-                                    adapter.reserv.addAll(items);
-                                    adapter.notifyDataSetChanged();
-                                } else {
-                                    refreshLayout.setRefreshing(false);
-                                    GuiUtils.showRequestLimitErrorMessage(getActivity());
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<ServerResponse<ArrayList<User>>> call1, Throwable t) {
-                                refreshLayout.setRefreshing(false);
-                                Toast toast = Toast.makeText(getApplicationContext(),
-                                        getString(R.string.LOST_INTERNET_CONNECTION), Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                            }
-                        });
+                        recyclerView.scrollToPosition(items.size() - offset);
+                        adapter.notifyDataSetChanged();
                     } else {
                         refreshLayout.setRefreshing(false);
-                        GuiUtils.showRequestLimitErrorMessage(getActivity());
+                        GuiUtils.showRequestErrorMessage(getActivity());
                     }
                 }
 
@@ -754,7 +593,6 @@ public class DialogFragment extends JugglerFragment {
 
     private class ViewHolder extends RecyclerView.ViewHolder {
         ImageView photo;
-        ImageView online;
         AutoLinkTextView body;
         TextView time;
         RelativeLayout background;
@@ -764,7 +602,6 @@ public class DialogFragment extends JugglerFragment {
         public ViewHolder(View itemView) {
             super(itemView);
             photo = (ImageView) itemView.findViewById(R.id.imageView);
-            online = (ImageView) itemView.findViewById(R.id.imageView6);
             body = (AutoLinkTextView) itemView.findViewById(R.id.textView2);
             time = (TextView) itemView.findViewById(R.id.textView);
             background = (RelativeLayout) itemView.findViewById(R.id.relativeLayout);
@@ -807,21 +644,6 @@ public class DialogFragment extends JugglerFragment {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             final Dialogs dialog = items.get(position);
-            final int finalPos = position;
-            User user = new User();
-            for (int i = 0; i < names.size(); i++) {
-                if (dialog.getOut() == 0) {
-                    if (dialog.getUser_id() == names.get(i).getId()) {
-                        user = names.get(i);
-                        break;
-                    }
-                } else {
-                    if (dialog.getFrom_id() == names.get(i).getId()) {
-                        user = names.get(i);
-                        break;
-                    }
-                }
-            }
 
             if (dialog.getRead_state() == 0) {
                 holder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accent));
@@ -834,26 +656,8 @@ public class DialogFragment extends JugglerFragment {
                 }
             }
             holder.line.removeAllViews();
-            if (user.getOnline() != 0) {
-                holder.online.setVisibility(View.VISIBLE);
-            } else {
-                holder.online.setVisibility(View.INVISIBLE);
-            }
-            if (preferencesManager.getSettingPhotoUserOn()) {
-                Picasso.with(getActivity())
-                        .load(user.getPhoto_100())
-                        .transform(new CircularTransformation())
-                        .into(holder.photo);
-            } else {
-                Picasso.with(getActivity())
-                        .load(R.drawable.soviet100)
-                        .transform(new CircularTransformation())
-                        .into(holder.photo);
-            }
-            final User userFinal = user;
             final ViewHolder viewHolder = holder;
 
-            if (frwdMessages.size() == 0) forwardButton.setVisibility(View.INVISIBLE);
             View.OnClickListener forwardListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -881,41 +685,6 @@ public class DialogFragment extends JugglerFragment {
                     } else {
                         mess.setHint(getString(R.string.WRITE_MESSAGE));
                     }
-                    if (frwdMessages.size() > 0) {
-                        forwardButton.setVisibility(View.VISIBLE);
-                        forwardButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-                                LayoutInflater inflater = getActivity().getLayoutInflater();
-                                View view = inflater.inflate(R.layout.layout_alert_dialog_forward_question, null);
-                                view.findViewById(R.id.dialog_variant).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        alertDialog.dismiss();
-                                        navigateTo().state(Add.newActivity(new DialogListState(new Gson().toJson(frwdMessages)), BaseActivity.class));
-                                        frwdMessages.clear();
-                                        adapter.notifyDataSetChanged();
-                                        mess.setHint(getString(R.string.WRITE_MESSAGE));
-                                    }
-                                });
-                                view.findViewById(R.id.friend_variant).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        alertDialog.dismiss();
-                                        navigateTo().state(Add.newActivity(new FriendListState(new Gson().toJson(frwdMessages)), BaseActivity.class));
-                                        frwdMessages.clear();
-                                        adapter.notifyDataSetChanged();
-                                        mess.setHint(getString(R.string.WRITE_MESSAGE));
-                                    }
-                                });
-                                alertDialog.setView(view);
-                                alertDialog.show();
-                            }
-                        });
-                    } else {
-                        forwardButton.setVisibility(View.INVISIBLE);
-                    }
                 }
             };
             holder.itemView.setOnClickListener(forwardListener);
@@ -939,20 +708,6 @@ public class DialogFragment extends JugglerFragment {
             String time_time = time.format(dateTs);
             String time_year = year.format(dateTs);
             if (dialog.getDate() != 0) {
-                if (chat_id != 0) {
-
-                    if (year.format(dateTs).equals(year.format(dateCurr))) {
-                        if ((day.format(dateTs).equals(day.format(dateCurr))) && (month.format(dateTs).equals(month.format(dateCurr)))) {
-                            holder.time.setText(user.getFirst_name() + " " + user.getLast_name() + ", " + time_time);
-                        } else {
-                            holder.time.setText(user.getFirst_name() + " " + user.getLast_name() + ", " + time_day + " "
-                                    + convertMonth(Integer.parseInt(month.format(dateTs))));
-                        }
-                    } else {
-                        holder.time.setText(user.getFirst_name() + " " + user.getLast_name() + ", " + time_year);
-                    }
-                } else {
-
                     if (year.format(dateTs).equals(year.format(dateCurr))) {
                         if ((day.format(dateTs).equals(day.format(dateCurr))) && (month.format(dateTs).equals(month.format(dateCurr)))) {
                             holder.time.setText("" + time_time);
@@ -963,17 +718,11 @@ public class DialogFragment extends JugglerFragment {
                     } else {
                         holder.time.setText("" + time_year);
                     }
-                }
             } else  {
                 holder.time.setText("Отправляем...");
             }
-            if (user.getOnline() == 0) {
-                holder.online.setVisibility(View.INVISIBLE);
-            } else {
-                holder.online.setVisibility(View.VISIBLE);
-            }
             holder.body.addAutoLinkMode(AutoLinkMode.MODE_URL);
-            holder.body.setUrlModeColor(Color.rgb(0, 200, 250));
+            holder.body.setUrlModeColor(getContext().getResources().getColor(R.color.accent));
             holder.body.setAutoLinkOnClickListener(new AutoLinkOnClickListener() {
                 @Override
                 public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText) {
@@ -993,14 +742,15 @@ public class DialogFragment extends JugglerFragment {
             if (dialog.getFwd_messages().size() != 0) {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 View cont = inflater.inflate(R.layout.attachment_conteiner_dinamic, null);
+                cont.findViewById(R.id.imageView).setVisibility(View.GONE);
                 TextView text = (TextView) cont.findViewById(R.id.textView3);
-                text.setTextColor(Color.BLUE);
+                text.setTextColor(getResources().getColor(R.color.accent));
                 text.setText(getString(R.string.FORWARD_MESSAGES));
                 holder.line.addView(cont);
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        navigateTo().state(Add.newActivity(new ForwardMessagesState(new Gson().toJson(dialog.getFwd_messages()), new Gson().toJson(names), chat_id == 0 ? user_id : 2000000000 + chat_id), BaseActivity.class));
+//                        navigateTo().state(Add.newActivity(new ForwardMessagesState(new Gson().toJson(dialog.getFwd_messages()), new Gson().toJson(names), chat_id == 0 ? user_id : 2000000000 + chat_id), BaseActivity.class));
                     }
                 });
             }
@@ -1035,12 +785,13 @@ public class DialogFragment extends JugglerFragment {
                             View cont = inflater.inflate(R.layout.attachment_conteiner_dinamic, null);
                             ImageView photochka = (ImageView) cont.findViewById(R.id.imageView);
                             TextView text = (TextView) cont.findViewById(R.id.textView3);
+                            text.setVisibility(View.GONE);
                             text.setText(getString(R.string.PHOTO));
                             final String finalPhoto = photo;
                             Picasso.with(getActivity())
                                     .load(photomess)
-                                    .placeholder(R.drawable.loadshort)
-                                    .error(R.drawable.errorshort)
+                                    .placeholder(R.drawable.ic_download_icon)
+                                    .error(R.drawable.ic_error_icon)
                                     .into(photochka);
                             holder.line.addView(cont);
                             photochka.setOnClickListener(new View.OnClickListener() {
@@ -1050,8 +801,6 @@ public class DialogFragment extends JugglerFragment {
                                             .show();
                                 }
                             });
-                        } else {
-                            bodyContainer += "\n" + getString(R.string.PHOTO);
                         }
                         break;
                     }
@@ -1061,10 +810,11 @@ public class DialogFragment extends JugglerFragment {
                         ImageView photochka = (ImageView) cont.findViewById(R.id.imageView);
                         TextView text = (TextView) cont.findViewById(R.id.textView3);
                         text.setText(R.string.STICKER);
+                        text.setVisibility(View.GONE);
                         Picasso.with(getActivity())
                                 .load(dialog.getAttachments().get(i).getSticker().getPhoto_256())
-                                .placeholder(R.drawable.loadshort)
-                                .error(R.drawable.errorshort)
+                                .placeholder(R.drawable.ic_download_icon)
+                                .error(R.drawable.ic_error_icon)
                                 .resize(200, 200)
                                 .centerCrop()
                                 .into(photochka);
@@ -1083,8 +833,8 @@ public class DialogFragment extends JugglerFragment {
                         text.setText(dialog.getAttachments().get(i).getVideo().getTitle());
                         Picasso.with(getActivity())
                                 .load(dialog.getAttachments().get(i).getVideo().getPhoto_320())
-                                .placeholder(R.drawable.loadshort)
-                                .error(R.drawable.errorshort)
+                                .placeholder(R.drawable.ic_download_icon)
+                                .error(R.drawable.ic_error_icon)
                                 .resize(400, 300)
                                 .centerCrop()
                                 .into(photochka);
@@ -1242,8 +992,8 @@ public class DialogFragment extends JugglerFragment {
                         text.setText(R.string.GIFT);
                         Picasso.with(getActivity())
                                 .load(dialog.getAttachments().get(i).getGift().getThumb_256())
-                                .placeholder(R.drawable.loadshort)
-                                .error(R.drawable.errorshort)
+                                .placeholder(R.drawable.ic_download_icon)
+                                .error(R.drawable.ic_error_icon)
                                 .resize(200, 200)
                                 .centerCrop()
                                 .into(photochka);
@@ -1254,8 +1004,10 @@ public class DialogFragment extends JugglerFragment {
 
             }
             if (crypting) bodyContainer = CryptUtils.decryptWritibleString(bodyContainer, cryptKey);
-            holder.body.setTextColor(getResources().getColor(crypting ? R.color.orange : R.color.black));
+            holder.body.setTextColor(getResources().getColor(crypting ? R.color.green : R.color.primary_dark));
             holder.body.setAutoLinkText(bodyContainer);
+            if (TextUtils.isEmpty(bodyContainer)) holder.body.setVisibility(View.GONE);
+            else holder.body.setVisibility(View.VISIBLE);
             View.OnLongClickListener copyTextListener = new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -1282,14 +1034,11 @@ public class DialogFragment extends JugglerFragment {
 
     class UpdateDataBase extends AsyncTask<Void, Void, Void> {
         ArrayList<Dialogs> items;
-        ArrayList<User> names;
         int user_id;
 
-        public UpdateDataBase(int id, ArrayList<Dialogs> itemArrayList, ArrayList<User> userArrayList) {
+        public UpdateDataBase(int id, ArrayList<Dialogs> itemArrayList) {
             items = new ArrayList<>();
-            names = new ArrayList<>();
             items.addAll(itemArrayList);
-            names.addAll(userArrayList);
             user_id = id;
         }
 
@@ -1310,14 +1059,6 @@ public class DialogFragment extends JugglerFragment {
                     contentValues.put(DBHelper.KEY_TIME_MESSAGES, items.get(i).getDate());
                     contentValues.put(DBHelper.KEY_OBJ, gson.toJson(items.get(i)));
                     dataBase.insert(DBHelper.TABLE_MESSAGES, null, contentValues);
-                }
-                ContentValues contentValues1 = new ContentValues();
-                for (int i = 0; i < names.size(); i++) {
-                    contentValues1.put(DBHelper.KEY_ID_DIALOG, user_id);
-                    contentValues1.put(DBHelper.KEY_OBJ, gson.toJson(names.get(i)));
-                    long num = 0;
-                    num = dataBase.insert(DBHelper.TABLE_USERS_IN_MESSAGES, null, contentValues1);
-                    Log.i("namesChat", "" + names.get(i).getFirst_name() + " " + num);
                 }
                 dataBase.setTransactionSuccessful();
             } catch (Exception e) {

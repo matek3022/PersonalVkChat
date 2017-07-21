@@ -157,4 +157,23 @@ public class PreferencesManager {
         editor.putString("decryptString",string);
         editor.apply();
     }
+
+    public void setChatUserId(int chatUserId) {
+        SharedPreferences.Editor editor = settingsPref.edit();
+        editor.putInt("chatUserId",chatUserId);
+        editor.apply();
+    }
+
+    public int getChatUserId(){
+        return settingsPref.getInt("chatUserId", 0);
+    }
+
+    public void setTitle(String title) {
+        SharedPreferences.Editor editor = settingsPref.edit();
+        editor.putString("title",title);
+        editor.apply();
+    }
+    public String getTitle() {
+        return settingsPref.getString("title", "Чат");
+    }
 }

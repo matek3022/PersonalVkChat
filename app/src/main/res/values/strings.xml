@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cookies</string>
+    <string name="app_name">Trvl Chat</string>
     <string name="title_dialogs">Диалоги</string>
     <string name="title_settings" translatable="false">Настройки</string>
     <string name="title_friends" translatable="false">Друзья</string>

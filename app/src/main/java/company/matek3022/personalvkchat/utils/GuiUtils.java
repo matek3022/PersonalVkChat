@@ -26,7 +26,11 @@ public class GuiUtils {
         }
     }
 
-    public static void showRequestLimitErrorMessage(Context context) {
-        Toast.makeText(context, "Привышен лимит запросов, подождите несколько секунд", Toast.LENGTH_SHORT).show();
+    public static void showRequestErrorMessage(Context context) {
+        Toast.makeText(context, "При запросе произошла ошибка, повторите поздней", Toast.LENGTH_SHORT).show();
+    }
+
+    public static void showMessage(Context context, String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 }
