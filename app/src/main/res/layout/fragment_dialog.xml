@@ -5,8 +5,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootContainer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:layout_height="match_parent">
+    <ImageView
+        android:alpha="0.2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@mipmap/image_background"
+        android:scaleType="centerCrop"
+        />
+
+    <View
+        android:id="@+id/top_shape"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/shape_line" />
 
     <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -14,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_above="@+id/inputContainer"
-        android:background="@android:color/white"
+        android:layout_below="@id/top_shape"
         app:srl_direction="both"
         tools:context="com.shppandroid1.app.Main2Activity">
 
@@ -23,9 +36,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alwaysDrawnWithCache="false"
-            android:background="@android:color/white"
             android:divider="@null" />
     </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+
+    <View
+        android:layout_below="@id/refresh"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/shape_line" />
 
     <RelativeLayout
         android:id="@+id/inputContainer"
@@ -63,17 +81,16 @@
             android:layout_toRightOf="@+id/emoji_button"
             android:layout_toStartOf="@id/button"
             android:textColor="@color/primary_dark"
-            android:textColorHint="@color/primary_light"
-            android:background="@android:color/white"
+            android:textColorHint="@color/secondary_text"
             android:ems="10"
             android:hint="@string/WRITE_MESSAGE"
             android:inputType="textMultiLine"
             android:maxLines="5"
             android:minHeight="40dp"
-            android:paddingLeft="@dimen/defaultPadding"
-            android:paddingRight="@dimen/defaultPadding"
+            android:layout_marginLeft="@dimen/defaultPadding"
+            android:layout_marginRight="@dimen/defaultPadding"
             android:paddingBottom="@dimen/defaultPadding"
-            tools:text="asgdddddsdfsadhfghasjdgfjhsagdjfgjhasgdfjhgsjahdgfjgsajdgfjhsgajdhfgjasgdjhfgjashdgfjhasgdfasdfgjasdfsadfsad" />
+            tools:text="asdfasfdasdfasdfasdfsadf" />
 
         <Button
             android:layout_marginRight="@dimen/defaultPadding"

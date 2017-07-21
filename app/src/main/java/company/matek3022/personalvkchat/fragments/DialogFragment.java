@@ -648,7 +648,7 @@ public class DialogFragment extends JugglerFragment {
             if (dialog.getRead_state() == 0) {
                 holder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accent));
             } else {
-                holder.foo.setBackgroundColor(Color.WHITE);
+                holder.foo.setBackgroundColor(getResources().getColor(R.color.shadow));
             }
             for (int i = 0; i < frwdMessages.size(); i++) {
                 if (dialog.getId() == frwdMessages.get(i)) {

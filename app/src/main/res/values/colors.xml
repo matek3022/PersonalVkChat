@@ -96,6 +96,9 @@
     <color name="black_alpha_80">#34000000</color>
     <color name="black_alpha_90">#1A000000</color>
 
+    <color name="shadow">#0000</color>
+    <color name="title_background">#fafaf0</color>
+
     <color name="primary">#FF5722</color>
     <color name="primary_dark">#E64A19</color>
     <color name="primary_light">#FFCCBC</color>
