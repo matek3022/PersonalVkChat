@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -666,7 +665,7 @@ public class DialogFragment extends JugglerFragment {
                         if (frwdMessages.get(i) == dialog.getId()) {
                             frwdMessages.remove(i);
                             if (dialog.getRead_state() == 1) {
-                                viewHolder.foo.setBackgroundColor(Color.WHITE);
+                                viewHolder.foo.setBackgroundColor(getResources().getColor(R.color.shadow));
                             } else {
                                 viewHolder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accent));
                             }
