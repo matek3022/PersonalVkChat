@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import company.matek3022.personalvkchat.R;
 import company.matek3022.personalvkchat.activitys.BaseActivity;
 import company.matek3022.personalvkchat.managers.PreferencesManager;
+import company.matek3022.personalvkchat.utils.NetworkUtils;
 import company.matek3022.personalvkchat.vkobjects.ServerResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -86,7 +87,7 @@ public class LongPollService extends Service {
 
             @Override
             public void onFailure(Call<LongPollResponse> call, Throwable t) {
-                if (t.getMessage().contains("Unable")) {
+                if (!NetworkUtils.hasInternetConnection(getBaseContext())) {
 //                    Toast.makeText(getApplicationContext(), "Произошла ошибка! Мы уже перезапускаем сервис", Toast.LENGTH_SHORT).show();
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -97,6 +98,17 @@ public class LongPollService extends Service {
                 } else {
                     updateLongPoll();
                 }
+//                if (t.getMessage().contains("Unable")) {
+////                    Toast.makeText(getApplicationContext(), "Произошла ошибка! Мы уже перезапускаем сервис", Toast.LENGTH_SHORT).show();
+//                    handler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            restartService();
+//                        }
+//                    }, INTERNET_DELAY);
+//                } else {
+//                    updateLongPoll();
+//                }
             }
         });
     }
@@ -111,7 +123,7 @@ public class LongPollService extends Service {
 
             @Override
             public void onFailure(Call<ServerResponse<GetLpSrvr>> call, Throwable t) {
-                if (t.getMessage().contains("Unable")) {
+                if (!NetworkUtils.hasInternetConnection(getBaseContext())) {
 //                    Toast.makeText(getApplicationContext(), "Произошла ошибка! Мы уже перезапускаем сервис", Toast.LENGTH_SHORT).show();
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -122,6 +134,17 @@ public class LongPollService extends Service {
                 } else {
                     updateLongPoll();
                 }
+//                if (t.getMessage().contains("Unable")) {
+////                    Toast.makeText(getApplicationContext(), "Произошла ошибка! Мы уже перезапускаем сервис", Toast.LENGTH_SHORT).show();
+//                    handler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            restartService();
+//                        }
+//                    }, INTERNET_DELAY);
+//                } else {
+//                    updateLongPoll();
+//                }
             }
         });
     }
