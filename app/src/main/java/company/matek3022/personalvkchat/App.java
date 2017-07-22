@@ -3,7 +3,6 @@ package company.matek3022.personalvkchat;
 import android.app.Application;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.vk.sdk.VKSdk;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,10 +28,11 @@ public class App extends Application {
             .build();
     public static final VKService service = retrofit.create(VKService.class);
 
+    public static boolean showNotif = true;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        VKSdk.initialize(getApplicationContext());
         Fresco.initialize(getApplicationContext());
         DBHelper.init(getApplicationContext());
         PreferencesManager.init(getApplicationContext());

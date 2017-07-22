@@ -14,10 +14,7 @@ import android.widget.Toast;
 import company.matek3022.personalvkchat.R;
 import company.matek3022.personalvkchat.activitys.StartActivity;
 import company.matek3022.personalvkchat.managers.PreferencesManager;
-
 import me.ilich.juggler.gui.JugglerFragment;
-
-import static com.vk.sdk.VKUIHelper.getApplicationContext;
 
 /**
  * Created by matek on 08.07.2017.
@@ -83,7 +80,7 @@ public class SettingFragment extends JugglerFragment {
             @Override
             public void onClick(View v) {
                 preferencesManager.setCryptKey(editText.getText().toString());
-                Toast.makeText(getApplicationContext(),"Ключ сохранен", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"Ключ сохранен", Toast.LENGTH_SHORT).show();
             }
         });
 

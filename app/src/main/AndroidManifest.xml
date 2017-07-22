@@ -3,7 +3,7 @@
 package="company.matek3022.personalvkchat">
 
 <uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 <application
     android:name=".App"
@@ -29,6 +29,7 @@ package="company.matek3022.personalvkchat">
     </activity>
     <activity android:name=".activitys.BaseActivity"
         android:screenOrientation="portrait"
+        android:launchMode="singleTop"
         android:theme="@style/AppTheme.NoActionBar">
     </activity>
 </application>

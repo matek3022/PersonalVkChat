@@ -1,23 +1,16 @@
 package company.matek3022.personalvkchat.vkobjects.longpolling;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.ArrayList;
 
-import company.matek3022.personalvkchat.R;
-import company.matek3022.personalvkchat.activitys.BaseActivity;
 import company.matek3022.personalvkchat.managers.PreferencesManager;
 import company.matek3022.personalvkchat.utils.NetworkUtils;
 import company.matek3022.personalvkchat.vkobjects.ServerResponse;
@@ -54,6 +47,11 @@ public class LongPollService extends Service {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         if (!isRunning) {
@@ -66,7 +64,7 @@ public class LongPollService extends Service {
                 }
             }).start();
         }
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     private void initPrefs() {
@@ -196,19 +194,5 @@ public class LongPollService extends Service {
                 return null;
             }
         }.execute();
-    }
-
-    private void showNotification(String message) {
-        Intent intent = new Intent(this, BaseActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.launcher))
-                .setSmallIcon(R.drawable.messageicon)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(message)
-                .setContentIntent(pIntent);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(133711, builder.build());
     }
 }

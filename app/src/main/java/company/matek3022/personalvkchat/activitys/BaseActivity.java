@@ -12,6 +12,8 @@ import me.ilich.juggler.Juggler;
 import me.ilich.juggler.gui.JugglerActivity;
 import me.ilich.juggler.states.State;
 
+import static company.matek3022.personalvkchat.App.showNotif;
+
 public class BaseActivity extends JugglerActivity{
     public static MediaPlayer mediaPlayer;
 
@@ -39,6 +41,18 @@ public class BaseActivity extends JugglerActivity{
         Intent intent = new Intent(context, BaseActivity.class);
         intent.putExtra(EXTRA_STATE, state);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        showNotif = false;
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        showNotif = true;
+        super.onPause();
     }
 
     @Override

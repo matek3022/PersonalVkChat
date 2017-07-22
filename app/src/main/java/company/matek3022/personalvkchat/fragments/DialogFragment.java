@@ -1,5 +1,7 @@
 package company.matek3022.personalvkchat.fragments;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -10,12 +12,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -74,8 +78,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.vk.sdk.VKUIHelper.getApplicationContext;
 import static company.matek3022.personalvkchat.App.service;
+import static company.matek3022.personalvkchat.App.showNotif;
 
 /**
  * Created by matek on 08.07.2017.
@@ -88,10 +92,9 @@ public class DialogFragment extends JugglerFragment {
     }
 
     private ArrayList<Integer> frwdMessages = new ArrayList<>();
-
     private int profileId = PreferencesManager.getInstance().getUserID();
-    private int user_id;
-    private String title;
+    private int user_id = PreferencesManager.getInstance().getChatUserId();
+    private String title = PreferencesManager.getInstance().getTitle();
     private boolean frwd;
     private Adapter adapter;
     private Button sendButton;
@@ -173,6 +176,9 @@ public class DialogFragment extends JugglerFragment {
                             }
                             if (currChatId == 0) {
                                 if (currUserId == user_id) {
+                                    if (out == 0) {
+                                        showNotification(getActivity(), event.message);
+                                    }
                                     if (items.size()>0) {
                                         if (items.get(items.size()-1).getId() == 0) {
                                             items.get(items.size() - 1).setId(event.mid);
@@ -207,6 +213,27 @@ public class DialogFragment extends JugglerFragment {
             }.execute(intent);
         }
     };
+
+    private void showNotification(Context context, String message) {
+        if (showNotif) {
+            Intent intent = new Intent(context, BaseActivity.class);
+            PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.launcher))
+                    .setSmallIcon(R.drawable.ic_mess)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setContentIntent(pIntent);
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(1337, builder.build());
+        }
+    }
+
+    private void closeNotification(Context context) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(1337);
+    }
 
     private BroadcastReceiver typingReceiver = new BroadcastReceiver() {
         @Override
@@ -312,8 +339,7 @@ public class DialogFragment extends JugglerFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        user_id = PreferencesManager.getInstance().getChatUserId();
-        getActivity().setTitle(PreferencesManager.getInstance().getTitle());
+        getActivity().setTitle(title);
         if (user_id == 0) {
             showUserIdDialog();
         }
@@ -324,6 +350,12 @@ public class DialogFragment extends JugglerFragment {
         localBroadcastManager.registerReceiver(readInReceiver, new IntentFilter(LongPollEvent.READ_IN_INTENT));
         localBroadcastManager.registerReceiver(readOutReceiver, new IntentFilter(LongPollEvent.READ_OUT_INTENT));
         return inflater.inflate(R.layout.fragment_dialog, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        closeNotification(getActivity());
+        super.onResume();
     }
 
     @Override
@@ -361,9 +393,8 @@ public class DialogFragment extends JugglerFragment {
         imageEmoji.setImageResource(R.drawable.smiley);
         setHasOptionsMenu(true);
         EmojIconActions emojIconActions = new EmojIconActions(getActivity(), view.findViewById(R.id.rootContainer), mess, imageEmoji);
+//        emojIconActions.setUseSystemEmoji(true);
         emojIconActions.ShowEmojIcon();
-        emojIconActions.setUseSystemEmoji(true);
-        mess.setUseSystemDefault(true);
 
         if (frwdMessages.size() > 0) mess.setHint("Выбрано " + frwdMessages.size());
 
@@ -424,7 +455,7 @@ public class DialogFragment extends JugglerFragment {
                             @Override
                             public void onFailure(Call<ServerResponse> call, Throwable t) {
                                 refreshLayout.setRefreshing(false);
-                                Toast toast = Toast.makeText(getApplicationContext(),
+                                Toast toast = Toast.makeText(getActivity(),
                                         getString(R.string.LOST_INTERNET_CONNECTION), Toast.LENGTH_SHORT);
                                 for (int i = 0; i < items.size(); i++) {
                                     if (items.get(i).getBody().equals(messageFinal)) {
@@ -438,7 +469,7 @@ public class DialogFragment extends JugglerFragment {
                         });
                     } else {
                         refreshLayout.setRefreshing(false);
-                        Toast toast = Toast.makeText(getApplicationContext(),
+                        Toast toast = Toast.makeText(getActivity(),
                                 getString(R.string.VOID_MESSAGE), Toast.LENGTH_SHORT);
                         toast.show();
                     }
@@ -517,7 +548,7 @@ public class DialogFragment extends JugglerFragment {
                     @Override
                     public void onFailure(Call<ServerResponse<ArrayList<User>>> call, Throwable t) {
                         refreshLayout.setRefreshing(false);
-                        Toast.makeText(getApplicationContext(), "Произошла ошибка", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Произошла ошибка", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -575,7 +606,7 @@ public class DialogFragment extends JugglerFragment {
                 @Override
                 public void onFailure(Call<ServerResponse<ItemMess<ArrayList<Dialogs>>>> call, Throwable t) {
                     refreshLayout.setRefreshing(false);
-                    Toast toast = Toast.makeText(getApplicationContext(),
+                    Toast toast = Toast.makeText(getActivity(),
                             getString(R.string.LOST_INTERNET_CONNECTION), Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
@@ -751,7 +782,6 @@ public class DialogFragment extends JugglerFragment {
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-//                        navigateTo().state(Add.newActivity(new ForwardMessagesState(new Gson().toJson(dialog.getFwd_messages()), new Gson().toJson(names), chat_id == 0 ? user_id : 2000000000 + chat_id), BaseActivity.class));
                     }
                 });
             }
@@ -844,7 +874,7 @@ public class DialogFragment extends JugglerFragment {
                         photochka.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Toast toast = Toast.makeText(getApplicationContext(),
+                                Toast toast = Toast.makeText(getActivity(),
                                         getString(R.string.LOADING), Toast.LENGTH_LONG);
                                 toast.show();
                                 String TOKEN = preferencesManager.getToken();
@@ -861,7 +891,7 @@ public class DialogFragment extends JugglerFragment {
 
                                     @Override
                                     public void onFailure(Call<ServerResponse<ItemMess<ArrayList<VideoInformation>>>> call, Throwable t) {
-                                        Toast toast = Toast.makeText(getApplicationContext(),
+                                        Toast toast = Toast.makeText(getActivity(),
                                                 getString(R.string.LOST_INTERNET_CONNECTION), Toast.LENGTH_SHORT);
                                         toast.setGravity(Gravity.CENTER, 0, 0);
                                         toast.show();
@@ -879,13 +909,13 @@ public class DialogFragment extends JugglerFragment {
                         text.setText(dialog.getAttachments().get(i).getDoc().getTitle());
                         if (dialog.getAttachments().get(i).getDoc().getType() == 1) {
                             Picasso.with(getActivity())
-                                    .load(R.drawable.doc)
+                                    .load(R.drawable.ic_doc)
                                     .resize(150, 150)
                                     .centerCrop()
                                     .into(photochka);
                         } else {
                             Picasso.with(getActivity())
-                                    .load(R.drawable.zip)
+                                    .load(R.drawable.ic_zip)
                                     .resize(150, 150)
                                     .centerCrop()
                                     .into(photochka);
