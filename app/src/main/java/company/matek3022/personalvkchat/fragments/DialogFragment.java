@@ -362,6 +362,8 @@ public class DialogFragment extends JugglerFragment {
         setHasOptionsMenu(true);
         EmojIconActions emojIconActions = new EmojIconActions(getActivity(), view.findViewById(R.id.rootContainer), mess, imageEmoji);
         emojIconActions.ShowEmojIcon();
+        emojIconActions.setUseSystemEmoji(true);
+        mess.setUseSystemDefault(true);
 
         if (frwdMessages.size() > 0) mess.setHint("Выбрано " + frwdMessages.size());
 

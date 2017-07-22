@@ -6,7 +6,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import cn.nekocode.emojix.Emojix;
 import company.matek3022.personalvkchat.fragments.states.DialogState;
 import company.matek3022.personalvkchat.vkobjects.longpolling.LongPollService;
 import me.ilich.juggler.Juggler;
@@ -50,9 +49,9 @@ public class BaseActivity extends JugglerActivity{
         }
         return state;
     }
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(Emojix.wrap(newBase));
-    }
+//
+//    @Override
+//    protected void attachBaseContext(Context newBase) {
+//        super.attachBaseContext(Emojix.wrap(newBase));
+//    }
 }

@@ -12,7 +12,9 @@
         android:layout_alignParentRight="true"
 
         android:layout_alignParentTop="true"
-        android:layout_margin="6dp">
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="100dp">
 
         <RelativeLayout
             android:id="@+id/relativeLayout"
@@ -54,17 +56,15 @@
 
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/ic_mess_out"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:minWidth="50dp"
-            android:minHeight="50dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginStart="5dp"/>
+            android:id="@+id/imageView"
+            android:src="@drawable/ic_arrow_right_mess"
+            android:layout_width="10dp"
+            android:layout_height="50dp"
+            android:paddingLeft="-1dp"
+            android:scaleType="centerCrop" />
 
 
     </RelativeLayout>
