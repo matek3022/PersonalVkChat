@@ -99,6 +99,9 @@
     <color name="shadow">#0000</color>
     <color name="title_background">#fafaf0</color>
 
+    <color name="primary_dark_alpha_70">#4EE64A19</color>
+    <color name="accent_alpha_70">#4E03A9F4</color>
+
     <color name="primary">#FF5722</color>
     <color name="primary_dark">#E64A19</color>
     <color name="primary_light">#FFCCBC</color>

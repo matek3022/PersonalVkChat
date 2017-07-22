@@ -647,13 +647,13 @@ public class DialogFragment extends JugglerFragment {
             final Dialogs dialog = items.get(position);
 
             if (dialog.getRead_state() == 0) {
-                holder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accent));
+                holder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accent_alpha_70));
             } else {
                 holder.foo.setBackgroundColor(getResources().getColor(R.color.shadow));
             }
             for (int i = 0; i < frwdMessages.size(); i++) {
                 if (dialog.getId() == frwdMessages.get(i)) {
-                    holder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.primary_dark));
+                    holder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.primary_dark_alpha_70));
                 }
             }
             holder.line.removeAllViews();
@@ -669,7 +669,7 @@ public class DialogFragment extends JugglerFragment {
                             if (dialog.getRead_state() == 1) {
                                 viewHolder.foo.setBackgroundColor(getResources().getColor(R.color.shadow));
                             } else {
-                                viewHolder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accent));
+                                viewHolder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accent_alpha_70));
                             }
                             chek = true;
                             break;
@@ -678,7 +678,7 @@ public class DialogFragment extends JugglerFragment {
 
                     if (!chek) {
                         frwdMessages.add(dialog.getId());
-                        viewHolder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.primary_dark));
+                        viewHolder.foo.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.primary_dark_alpha_70));
                     }
 
                     if (frwdMessages.size() > 0) {
