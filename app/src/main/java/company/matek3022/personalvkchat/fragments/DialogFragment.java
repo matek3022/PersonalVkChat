@@ -1,5 +1,6 @@
 package company.matek3022.personalvkchat.fragments;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -224,6 +225,7 @@ public class DialogFragment extends JugglerFragment {
                     .setSmallIcon(R.drawable.ic_mess)
                     .setContentTitle(title)
                     .setContentText(message)
+                    .setDefaults(Notification.DEFAULT_LIGHTS)
                     .setContentIntent(pIntent);
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(1337, builder.build());
