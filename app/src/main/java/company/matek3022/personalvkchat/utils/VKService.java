@@ -1,5 +1,7 @@
 package company.matek3022.personalvkchat.utils;
 
+import java.util.ArrayList;
+
 import company.matek3022.personalvkchat.vkobjects.Dialogs;
 import company.matek3022.personalvkchat.vkobjects.Item;
 import company.matek3022.personalvkchat.vkobjects.ItemMess;
@@ -9,9 +11,6 @@ import company.matek3022.personalvkchat.vkobjects.VideoInformation;
 import company.matek3022.personalvkchat.vkobjects.attachmenttype.PhotoMess;
 import company.matek3022.personalvkchat.vkobjects.longpolling.GetLpSrvr;
 import company.matek3022.personalvkchat.vkobjects.longpolling.LongPollResponse;
-
-import java.util.ArrayList;
-
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -39,6 +38,7 @@ public interface VKService {
                                                                   @Query("user_id") int user_id);
     @GET("messages.send?v=5.57")
     Call<ServerResponse> sendMessage(@Query("access_token") String access_token,
+                                     @Query("random_id") int random_id,
                                      @Query("user_id") int user_id,
                                      @Query("message") String message,
                                      @Query("chat_id") int chat_id,

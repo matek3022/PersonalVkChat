@@ -19,16 +19,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class App extends Application {
     private static final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(50, TimeUnit.SECONDS)
-            .readTimeout(50,TimeUnit.SECONDS).build();
+            .connectTimeout(300, TimeUnit.SECONDS)
+            .readTimeout(300,TimeUnit.SECONDS).build();
     public static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://api.vk.com/method/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build();
     public static final VKService service = retrofit.create(VKService.class);
-
-    public static boolean showNotif = true;
 
     @Override
     public void onCreate() {

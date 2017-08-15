@@ -5,19 +5,37 @@
     android:paddingTop="@dimen/defaultPadding"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <TextView
-        android:id="@+id/title_alert_dialog"
+    <Switch
+        android:id="@+id/notification_switch"
+        android:text="Уведомления"
         android:textColor="@color/primary_dark"
         android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/notification_settings"
+        android:text="Настройки уведомелний и выход из аккаунта VK"
+        android:layout_below="@+id/notification_switch"
+        android:padding="@dimen/defaultPadding"
+        android:textColor="@color/primary_dark"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:layout_below="@+id/notification_settings"
+        android:id="@+id/title_alert_dialog"
+        android:textColor="@color/primary_dark"
+        android:textSize="12sp"
         android:gravity="center"
         android:text="Введите id или nickName собеседника"
-        android:layout_marginBottom="@dimen/defaultPadding"
+        android:layout_marginBottom="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <EditText
         android:id="@+id/input_user_id"
         android:layout_below="@id/title_alert_dialog"
-        android:textColor="@color/primary_dark"
+        android:textColor="@color/accent_dark"
         android:textColorHint="@color/primary_light"
         android:hint="Введите сюда"
         android:textSize="16sp"

@@ -34,6 +34,19 @@ public class Dialogs implements Serializable {
         fwd_messages = new ArrayList<Dialogs>();
         attachments = new ArrayList<Attachment>();
     }
+    public Dialogs (int random_id, int id, int user_id, int chat_id, int from_id, String body, int read_state, int out, long date) {
+        this.id = id;
+        this.out = out;
+        this.random_id = random_id;
+        this.user_id = user_id;
+        this.chat_id = chat_id;
+        this.from_id = from_id;
+        this.body = body;
+        this.read_state = read_state;
+        this.date = date;
+        fwd_messages = new ArrayList<Dialogs>();
+        attachments = new ArrayList<Attachment>();
+    }
     public  Dialogs (int usid,String bady, int rs,int o, long d) {
         //access_token=at;
         user_id=usid;
@@ -53,6 +66,7 @@ public class Dialogs implements Serializable {
     private int id;
     private long date;
     private int out;
+    private int random_id;
     private int user_id;
     private int from_id;
     private int read_state;
@@ -65,6 +79,14 @@ public class Dialogs implements Serializable {
     private int[] chat_active;
     private int chat_id;
     private ArrayList<Attachment> attachments;
+
+    public int getRandom_id() {
+        return random_id;
+    }
+
+    public void setRandom_id(int random_id) {
+        this.random_id = random_id;
+    }
 
     public String getAction() {
         return action;

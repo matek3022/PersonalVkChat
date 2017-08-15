@@ -40,6 +40,7 @@ public class LongPollEvent extends ArrayList<Object> implements Serializable {
     public int flags;
     public int ts;
     public int chatId = 0;
+    public int randomId = 0;
     public String title;
     public String message;
     public LinkedTreeMap<String, String> obj;
@@ -58,6 +59,11 @@ public class LongPollEvent extends ArrayList<Object> implements Serializable {
                 try {
                     obj = (LinkedTreeMap<String, String>) get(7);
                 }catch (Exception ignored){
+                }
+                try {
+                    randomId = ((Double) get(7)).intValue();
+                }catch (Exception ignored){
+                    randomId = 0;
                 }
                 break;
             case READ_IN_EVENT:

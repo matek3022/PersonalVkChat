@@ -1,8 +1,6 @@
 package company.matek3022.personalvkchat.fragments;
 
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -13,16 +11,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,10 +33,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,18 +47,18 @@ import com.google.gson.reflect.TypeToken;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.AutoLinkTextView;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 import com.squareup.picasso.Picasso;
 import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 import java.util.TimeZone;
 
 import company.matek3022.personalvkchat.R;
 import company.matek3022.personalvkchat.activitys.BaseActivity;
+import company.matek3022.personalvkchat.activitys.StartActivity;
 import company.matek3022.personalvkchat.managers.PreferencesManager;
 import company.matek3022.personalvkchat.sqlite.DBHelper;
 import company.matek3022.personalvkchat.utils.CryptUtils;
@@ -80,7 +79,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static company.matek3022.personalvkchat.App.service;
-import static company.matek3022.personalvkchat.App.showNotif;
 
 /**
  * Created by matek on 08.07.2017.
@@ -100,8 +98,9 @@ public class DialogFragment extends JugglerFragment {
     private Adapter adapter;
     private Button sendButton;
     private RecyclerView recyclerView;
-    private SwipyRefreshLayout refreshLayout;
+    private SwipeRefreshLayout refreshLayout;
     private int off;
+    private int correctOff = 0;
     private ArrayList<Dialogs> items;
     private SQLiteDatabase dataBase;
     private PreferencesManager preferencesManager;
@@ -177,13 +176,19 @@ public class DialogFragment extends JugglerFragment {
                             }
                             if (currChatId == 0) {
                                 if (currUserId == user_id) {
-                                    if (out == 0) {
-                                        showNotification(getActivity(), event.message);
-                                    }
+//                                    if (out == 0) {
+//                                        showNotification(getActivity(), event.message);
+//                                    }
+                                    correctOff++;
                                     if (items.size()>0) {
-                                        if (items.get(items.size()-1).getId() == 0) {
-                                            items.get(items.size() - 1).setId(event.mid);
-                                            items.get(items.size() - 1).setDate(System.currentTimeMillis() / 1000L);
+
+                                        if (event.randomId != 0) {
+                                            for (int i = 0; i < items.size(); i++) {
+                                                if (items.get(i).getRandom_id() == event.randomId) {
+                                                    items.get(i).setId(event.mid);
+                                                    items.get(i).setDate(System.currentTimeMillis() / 1000L);
+                                                }
+                                            }
                                         } else {
                                             items.add(new Dialogs(event.mid, currUserId, currChatId, profileId, event.message, read, out, System.currentTimeMillis() / 1000L));
                                         }
@@ -214,23 +219,6 @@ public class DialogFragment extends JugglerFragment {
             }.execute(intent);
         }
     };
-
-    private void showNotification(Context context, String message) {
-        if (showNotif) {
-            Intent intent = new Intent(context, BaseActivity.class);
-            PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.launcher))
-                    .setSmallIcon(R.drawable.ic_mess)
-                    .setContentTitle(title)
-                    .setContentText(message)
-                    .setDefaults(Notification.DEFAULT_LIGHTS)
-                    .setContentIntent(pIntent);
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(1337, builder.build());
-        }
-    }
 
     private void closeNotification(Context context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -389,7 +377,7 @@ public class DialogFragment extends JugglerFragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         mess = (EmojiconEditText) view.findViewById(R.id.editText);
-        refreshLayout = (SwipyRefreshLayout) view.findViewById(R.id.refresh);
+        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
         sendButton = (Button) view.findViewById(R.id.button);
         ImageView imageEmoji = (ImageView) view.findViewById(R.id.emoji_button);
         imageEmoji.setImageResource(R.drawable.smiley);
@@ -407,18 +395,11 @@ public class DialogFragment extends JugglerFragment {
 
         refreshLayout.setColorSchemeResources(R.color.accent);
 
-        refreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                if (direction == SwipyRefreshLayoutDirection.BOTTOM) {
-                    if (off != 0) {
-                        off -= 20;
-                    }
-                    refresh(off);
-                } else {
-                    off += 20;
-                    refresh(off);
-                }
+            public void onRefresh() {
+                off += 20;
+                refresh(off + correctOff);
             }
         });
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -437,11 +418,12 @@ public class DialogFragment extends JugglerFragment {
                             strIdMess += "," + frwdMessages.get(i);
                         }
                         final String messageFinal = message;
-                        items.add(new Dialogs(0, user_id, 0, profileId, messageFinal, 0, 1, 0));
+                        final int randomId = new Random().nextInt();
+                        items.add(new Dialogs(randomId, 0, user_id, 0, profileId, messageFinal, 0, 1, 0));
                         recyclerView.scrollToPosition(items.size()-1);
                         adapter.notifyDataSetChanged();
                         String TOKEN = preferencesManager.getToken();
-                        Call<ServerResponse> call = service.sendMessage(TOKEN, user_id, message, 0, 2000000000, strIdMess);
+                        Call<ServerResponse> call = service.sendMessage(TOKEN, randomId, user_id, message, 0, 2000000000, strIdMess);
 
                         call.enqueue(new Callback<ServerResponse>() {
                             @Override
@@ -460,7 +442,7 @@ public class DialogFragment extends JugglerFragment {
                                 Toast toast = Toast.makeText(getActivity(),
                                         getString(R.string.LOST_INTERNET_CONNECTION), Toast.LENGTH_SHORT);
                                 for (int i = 0; i < items.size(); i++) {
-                                    if (items.get(i).getBody().equals(messageFinal)) {
+                                    if (items.get(i).getRandom_id() == randomId) {
                                         items.remove(i);
                                         adapter.notifyDataSetChanged();
                                     }
@@ -520,6 +502,19 @@ public class DialogFragment extends JugglerFragment {
         preferencesManager = PreferencesManager.getInstance();
         final View view = getActivity().getLayoutInflater().inflate(R.layout.layout_alert_select_dialog_id, null);
         ((EditText)view.findViewById(R.id.input_user_id)).setText(String.valueOf(preferencesManager.getChatUserId()));
+        ((Switch) view.findViewById(R.id.notification_switch)).setChecked(preferencesManager.getUseNotification());
+        ((Switch) view.findViewById(R.id.notification_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                preferencesManager.setUseNotification(b);
+            }
+        });
+        view.findViewById(R.id.notification_settings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showNotificationSettings();
+            }
+        });
         builder.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -559,11 +554,48 @@ public class DialogFragment extends JugglerFragment {
         builder.show();
     }
 
+    private void showNotificationSettings() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        View view = getActivity().getLayoutInflater().inflate(R.layout.layout_alert_notification_settings, null);
+        ((Switch) view.findViewById(R.id.notification_led)).setChecked(preferencesManager.getUseNotificationLed());
+        ((Switch) view.findViewById(R.id.notification_led)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                preferencesManager.setUseNotificationLed(b);
+            }
+        });
+        ((Switch) view.findViewById(R.id.notification_vibration)).setChecked(preferencesManager.getUseNotificationVibration());
+        ((Switch) view.findViewById(R.id.notification_vibration)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                preferencesManager.setUseNotificationVibration(b);
+            }
+        });
+        ((Switch) view.findViewById(R.id.notification_sound)).setChecked(preferencesManager.getUseNotificationSound());
+        ((Switch) view.findViewById(R.id.notification_sound)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                preferencesManager.setUseNotificationSound(b);
+            }
+        });
+        view.findViewById(R.id.exit_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                preferencesManager.setToken("");
+                getActivity().finish();
+                startActivity(StartActivity.getIntent(getActivity(),true,true));
+            }
+        });
+        builder.setView(view);
+        builder.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.dialog_menu_reload:
                 off = 0;
+                correctOff = 0;
                 refresh(off);
                 return true;
             case R.id.dialog_menu_security:
@@ -1037,7 +1069,7 @@ public class DialogFragment extends JugglerFragment {
 
             }
             if (crypting) bodyContainer = CryptUtils.decryptWritibleString(bodyContainer, cryptKey);
-            holder.body.setTextColor(getResources().getColor(crypting ? R.color.green : R.color.primary_dark));
+            holder.body.setTextColor(getResources().getColor(crypting ? R.color.green : R.color.accent_dark));
             holder.body.setAutoLinkText(bodyContainer);
             if (TextUtils.isEmpty(bodyContainer)) holder.body.setVisibility(View.GONE);
             else holder.body.setVisibility(View.VISIBLE);

@@ -176,4 +176,47 @@ public class PreferencesManager {
     public String getTitle() {
         return settingsPref.getString("title", "Чат");
     }
+
+
+    /**
+     * уведомления
+     * @return
+     */
+    public boolean getUseNotification() {
+        return settingsPref.getBoolean("useNotif", true);
+    }
+
+    public void setUseNotification(boolean use) {
+        SharedPreferences.Editor editor = settingsPref.edit();
+        editor.putBoolean("useNotif",use);
+        editor.apply();
+    }
+
+    public boolean getUseNotificationLed() {
+        return settingsPref.getBoolean("useNotifLed", true);
+    }
+
+    public void setUseNotificationLed(boolean use) {
+        SharedPreferences.Editor editor = settingsPref.edit();
+        editor.putBoolean("useNotifLed",use);
+        editor.apply();
+    }
+    public boolean getUseNotificationVibration() {
+        return settingsPref.getBoolean("useNotifVibration", true);
+    }
+
+    public void setUseNotificationVibration(boolean use) {
+        SharedPreferences.Editor editor = settingsPref.edit();
+        editor.putBoolean("useNotifVibration",use);
+        editor.apply();
+    }
+    public boolean getUseNotificationSound() {
+        return settingsPref.getBoolean("useNotifSound", true);
+    }
+
+    public void setUseNotificationSound(boolean use) {
+        SharedPreferences.Editor editor = settingsPref.edit();
+        editor.putBoolean("useNotifSound",use);
+        editor.apply();
+    }
 }
