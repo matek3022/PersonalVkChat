@@ -530,7 +530,7 @@ public class DialogFragment extends JugglerFragment {
                                 preferencesManager.setChatUserId(user.getId());
                                 user_id = user.getId();
                                 getActivity().setTitle(user.getFirst_name() + " " + user.getLast_name());
-                                Toast.makeText(getActivity(), "Новый чат создается...", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(getActivity(), "Новый чат создается...", Toast.LENGTH_SHORT).show();
                                 off = 0;
                                 refresh(0);
                             } else {
