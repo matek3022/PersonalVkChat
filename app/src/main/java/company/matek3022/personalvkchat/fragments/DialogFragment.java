@@ -182,7 +182,7 @@ public class DialogFragment extends JugglerFragment {
                                     correctOff++;
                                     if (items.size()>0) {
 
-                                        if (event.randomId != 0) {
+                                        if (event.randomId != 0 && out == 1) {
                                             for (int i = 0; i < items.size(); i++) {
                                                 if (items.get(i).getRandom_id() == event.randomId) {
                                                     items.get(i).setId(event.mid);
